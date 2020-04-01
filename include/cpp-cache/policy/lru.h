@@ -83,7 +83,7 @@ namespace policy
       if (it != map_.cend())
         list_.erase(it->second);
       // check if we need to expire a key as well
-      else if (is_full())
+      else if (map_.size() >= MaxSize)
       {
         // expire the last key in the list
         key_type last_key = list_.back();
