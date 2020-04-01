@@ -119,6 +119,16 @@ namespace policy
       return expired_keys;
     }
 
+    virtual bool is_expired_key(key_type key) const override
+    {
+      bool is_expired = ChainedCachingPolicy::is_expired_key(key);
+      if (is_expired) {
+        std::vector<key_type> expired_keys = {key};
+        erase_keys(expired_keys);
+      }
+      return is_expired;
+    }
+
   private:
     using set = std::unordered_set<key_type>;
 

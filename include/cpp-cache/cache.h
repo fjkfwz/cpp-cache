@@ -63,7 +63,10 @@ namespace cpp_cache
       std::lock_guard<locking_policy> lock(lock_);
 
       // first expire elements if necessary
-      expire();
+      if (caching_policy::is_expired_key(key)) {
+        std::vector<key_type> expired_keys = {key};
+        expire_from_storage(expired_keys);
+      }
 
       return has_internal(key);
     }
@@ -95,9 +98,6 @@ namespace cpp_cache
     {
       std::lock_guard<locking_policy> lock(lock_);
 
-      // first expire elements if necessary
-      expire();
-
       return caching_policy::touch_key(key);
     }
 
@@ -105,9 +105,6 @@ namespace cpp_cache
     void insert(const key_type& key, const cached_type& value, CachingPolicyArgs&&... args)
     {
       std::lock_guard<locking_policy> lock(lock_);
-
-      // first expire elements if necessary
-      expire();
 
       // insert the key into the caching policy and get any expired keys
       const auto expired_keys = caching_policy::insert_key(key, std::forward<CachingPolicyArgs>(args)...);
@@ -122,9 +119,6 @@ namespace cpp_cache
     void erase(const key_type& key)
     {
       std::lock_guard<locking_policy> lock(lock_);
-
-      // first expire elements if necessary
-      expire();
 
       // erase the key from the caching policy
       if (!caching_policy::erase_key(key))
@@ -151,8 +145,10 @@ namespace cpp_cache
     const cached_type& get_internal(const key_type& key) const
     {
       // first expire elements if necessary
-      expire();
-
+      if (caching_policy::is_expired_key(key)) {
+        std::vector<key_type> expired_keys = {key};
+        expire_from_storage(expired_keys);
+      }
       // check if the key is cached and if so touch it
       if (!has_internal(key) || !caching_policy::touch_key(key))
         throw std::out_of_range("element not present in the cache");

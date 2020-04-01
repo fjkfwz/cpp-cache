@@ -135,6 +135,26 @@ namespace policy
       return expired_keys;
     }
 
+    virtual bool is_expired_key(key_type key) const override
+    {
+      bool is_expired = ChainedCachingPolicy::is_expired_key(key);
+      if (is_expired) {
+        std::vector<key_type> expired_keys = {key};
+        erase_keys(expired_keys);
+      }
+
+      // get the current time
+      time now = time::clock::now();
+
+      // find and remove all keys that have expired their time-to-live
+      auto it = map_.find(key);
+      if (it != map_.cend() && it->second.end_ < now) {
+        is_expired |= true;
+        map_.erase(it);
+      }
+      return is_expired;
+    }
+
   private:
     using map = std::unordered_map<key_type, ttl_key>;
 

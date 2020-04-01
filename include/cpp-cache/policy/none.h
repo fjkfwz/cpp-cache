@@ -44,6 +44,9 @@ namespace policy
     inline virtual void clear_keys() { }
 
     virtual std::vector<key_type> expire_keys() const { return {}; }
+
+    virtual bool is_expired_key(key_type key) const { return false; }
+    
   };
 }
 }
