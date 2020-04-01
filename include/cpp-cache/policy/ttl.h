@@ -59,6 +59,7 @@ namespace policy
       return map_.find(key) != map_.cend();
     }
 
+
     inline virtual bool touch_key(const key_type& key) const override
     {
       // pass the touch on to the chained policy
@@ -69,9 +70,6 @@ namespace policy
       auto it = map_.find(key);
       if (it == map_.cend())
         return false;
-
-      // update the end time of the key because it was just used
-      it->second.end_ = time::clock::now() + it->second.duration_;
 
       return true;
     }

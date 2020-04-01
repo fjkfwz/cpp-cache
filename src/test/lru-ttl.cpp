@@ -143,14 +143,14 @@ TEST_CASE("llru-ttl", "[llru-ttl]")
 
   std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(0.7 * ttl_max_age_ms));
 
-  REQUIRE(lru_ttl_cache.has(one_key) == true);
+  REQUIRE(lru_ttl_cache.has(one_key) == false);
   REQUIRE(lru_ttl_cache.has(two_key) == false);
 
   lru_ttl_cache.touch(one_key);
 
   std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(0.5 * ttl_max_age_ms));
 
-  REQUIRE(lru_ttl_cache.has(one_key) == true);
+  REQUIRE(lru_ttl_cache.has(one_key) == false);
 
   std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(ttl_max_age_ms));
 
